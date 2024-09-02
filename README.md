@@ -37,7 +37,7 @@ Options:
    -k key                Encryption key
    -b                    Write Lua bytecode (-bb compiles the outer chunk)
    -s                    Don't write debug information
-   -z                    Compress the script with lz4
+   -z                    Compress the script with lzip
 ```
 
 Target
@@ -81,7 +81,7 @@ Compression
 ===========
 
 LuaX scripts can be compressed with the `-z` option.
-Sources are compressed with [`lz4`](https://github.com/CDSoft/luax/blob/master/doc/lz4.md).
+Sources are compressed with [`lzip`](https://github.com/CDSoft/luax/blob/master/doc/lzip.md).
 
 Example
 =======

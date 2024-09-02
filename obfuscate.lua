@@ -56,7 +56,7 @@ local cli = (function()
         : description "Don't write debug information"
         : target "strip"
     parser : flag "-z"
-        : description "Compress the script with lz4"
+        : description "Compress the script with lzip"
         : target "compress"
     return F{
         key = "“Everyone is a moon, and has a dark side which he never shows to anybody.” ― Mark Twain",
@@ -90,7 +90,7 @@ end
 local key_size = F.floor(16 + (#input-16)*(256-16)/(4096-16))
 key_size = F.max(16, F.min(256, key_size))
 
-local key = chunks_of(key_size, input:rc4(cli.key)) : fold1(crypt.rc4)
+local key = chunks_of(key_size, input:arc4(cli.key)) : fold1(crypt.arc4)
 
 ---------------------------------------------------------------------
 -- Compile the script to Lua bytecode
@@ -108,26 +108,38 @@ end
 
 local byte = string.byte
 local char = string.char
+local format = string.format
+
+local esc = {
+    ["'"]  = "\\'",     -- ' must be escaped as it is embeded in single quoted strings
+    ["\\"] = "\\\\",    -- \ must be escaped to avoid confusion with escaped chars
+}
+F.flatten{
+    F.range(0, 31),     -- non printable control chars
+    F.range(48, 57),    -- 0..9 must be escaped to avoid confusion decimal escape codes
+    F.range(128, 255),  -- non 7-bit ASCII codes are also not printable
+}
+: foreach(function(b) esc[char(b)] = format("\\%d", b) end)
 
 local function escape(s)
-    return s:gsub(".", function(c) return ("\\%d"):format(byte(c)) end)
+    return format("'%s'", s:gsub(".", esc))
 end
 
 local encrypted_script
 
 if cli.x then
 
-    local unlz4 = ""
+    local unlzip = ""
     if cli.compress then
-        local compressed_input = input:lz4()
+        local compressed_input = input:lzip()
         if #compressed_input < #input-8 then
             input = compressed_input
-            unlz4 = ":unlz4()"
+            unlzip = ":unlzip()"
         end
     end
 
-    encrypted_script = F.I { b=escape(input:rc4(key)), k=escape(key), unlz4=unlz4 } [===[
-return load(('$(b)'):unrc4'$(k)'$(unlz4))()
+    encrypted_script = F.I { b=escape(input:arc4(key)), k=escape(key), unlzip=unlzip } [===[
+return load(($(b)):unarc4$(k)$(unlzip))()
 ]===]
 
 else
@@ -143,7 +155,7 @@ else
     end
 
     encrypted_script = F.I { a=a, c=c, b=escape(table.concat(xs)), seed=seed } [===[
-local b,a,c,r,x,bt,ch,l,tc='$(b)',$(a),$(c),$(("0x%x"):format(seed)),{},string.byte,string.char,load,table.concat;for i=1,#b do r=r*a+c x[i]=ch(bt(b,i)~((r>>33)&0xff))end;return l(tc(x))()
+local b,a,c,r,x,bt,ch,l,tc=$(b),$(a),$(c),$(("0x%x"):format(seed)),{},string.byte,string.char,load,table.concat;for i=1,#b do r=r*a+c x[i]=ch(bt(b,i)~((r>>33)&0xff))end;return l(tc(x))()
 ]===]
 
 end
