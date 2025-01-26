@@ -59,7 +59,7 @@ Lua and LuaX use different encryption algorithms.
 Lua scripts are encrypted with a simple PRNG to "xor" script bytes.
 The code to decrypt is added to the output script.
 
-LuaX scripts are encrypted with [`crypt.rc4`](https://github.com/CDSoft/luax/blob/master/doc/crypt.md#rc4-encryption).
+LuaX scripts are encrypted with [`crypt.arc4`](https://github.com/CDSoft/luax/blob/master/doc/crypt.md#arc4-encryption).
 These scripts can only be executed with [LuaX](https://github.com/CDSoft/luax).
 
 Bytecode
