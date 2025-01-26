@@ -28,36 +28,14 @@ local term = require "term"
 ---------------------------------------------------------------------
 
 local cli = (function()
-    local parser = require "argparse"()
-        : name "obfuscate"
-        : description "Lua/LuaX script obfuscator"
-    parser : argument "input"
-        : description "Input script"
-        : args "1"
-        : argname "input"
-        : target "input"
-    parser : option "-o"
-        : description "Output file"
-        : args "1"
-        : argname "output"
-        : target "output"
-    parser : flag "-x"
-        : description "Generate a LuaX script"
-    parser : option "-k"
-        : description "Encryption key"
-        : args "1"
-        : argname "key"
-        : target "key"
-    parser : flag "-b"
-        : description "Write Lua bytecode (-bb compiles the outer chunk)"
-        : count "0-2"
-        : target "bytecode"
-    parser : flag "-s"
-        : description "Don't write debug information"
-        : target "strip"
-    parser : flag "-z"
-        : description "Compress the script with lzip"
-        : target "compress"
+    local parser = require "argparse"() : name "obfuscate" : description "Lua/LuaX script obfuscator"
+    parser : argument "input" : description "Input script" : args "1" : argname "input" : target "input"
+    parser : option "-o" : description "Output file" : args "1" : argname "output" : target "output"
+    parser : flag "-x" : description "Generate a LuaX script"
+    parser : option "-k" : description "Encryption key" : args "1" : argname "key" : target "key"
+    parser : flag "-b" : description "Write Lua bytecode (-bb compiles the outer chunk)" : count "0-2" : target "bytecode"
+    parser : flag "-s" : description "Don't write debug information" : target "strip"
+    parser : flag "-z" : description "Compress the script with lzip" : target "compress"
     return F{
         key = "“Everyone is a moon, and has a dark side which he never shows to anybody.” ― Mark Twain",
     } : patch(parser:parse(arg))
@@ -73,7 +51,7 @@ local input = assert(fs.read(cli.input))
 -- Remove the shebang line
 ---------------------------------------------------------------------
 
-input = input:gsub("^#!", "--")
+input = input:gsub("^(#!)", "--%1")
 
 ---------------------------------------------------------------------
 -- Compute the encryption key
@@ -171,9 +149,7 @@ end
 ---------------------------------------------------------------------
 
 encrypted_script = F.str {
-    cli.x
-        and "#!/usr/bin/env luax\n"
-        or  "#!/usr/bin/env lua\n",
+    "#!/usr/bin/env ", cli.x and "luax" or "lua", "\n",
     encrypted_script,
 }
 
