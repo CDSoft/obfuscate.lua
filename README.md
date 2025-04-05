@@ -19,7 +19,7 @@ If you need to protect your secrets, please **DO NOT USE** `obfuscate.lua`!
 Usage
 =====
 
-`obfuscate.lua` requires [LuaX](https://github.com/CDSoft/luax)
+`obfuscate.lua` requires [LuaX](https://codeberg.org/cdsoft/luax)
 but can produce plain Lua encrypted scripts.
 
 ```
@@ -59,8 +59,8 @@ Lua and LuaX use different encryption algorithms.
 Lua scripts are encrypted with a simple PRNG to "xor" script bytes.
 The code to decrypt is added to the output script.
 
-LuaX scripts are encrypted with [`crypt.arc4`](https://github.com/CDSoft/luax/blob/master/doc/crypt.md#arc4-encryption).
-These scripts can only be executed with [LuaX](https://github.com/CDSoft/luax).
+LuaX scripts are encrypted with [`crypt.arc4`](https://codeberg.org/cdsoft/luax/blob/master/doc/crypt.md#arc4-encryption).
+These scripts can only be executed with [LuaX](https://codeberg.org/cdsoft/luax).
 
 Bytecode
 ========
@@ -81,7 +81,7 @@ Compression
 ===========
 
 LuaX scripts can be compressed with the `-z` option.
-Sources are compressed with [`lzip`](https://github.com/CDSoft/luax/blob/master/doc/lzip.md).
+Sources are compressed with [`lzip`](https://codeberg.org/cdsoft/luax/blob/master/doc/lzip.md).
 
 Example
 =======
